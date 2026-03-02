@@ -1,0 +1,4 @@
+enum MealType{
+  pranzo,
+  cena;
+}
