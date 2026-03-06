@@ -1,92 +1,299 @@
-import 'domain/client_package/client.dart';
-import 'domain/menu_package/course.dart';
-import 'domain/menu_package/course_type.dart';
-import 'domain/menu_package/dish.dart';
-import 'domain/menu_package/meal_type.dart';
-import 'domain/menu_package/menu.dart';
-import 'domain/menu_package/menu_aggregator.dart';
-import 'domain/order_package/order.dart';
-import 'domain/order_package/order_manager.dart';
+import 'dart:async';
 
-void main() {
-  // ------------------------
-  // CREAZIONE MENU
-  // ------------------------
-  Course primo = Course(CourseType.primo, [
-    Dish("Carbonara", "Pasta con guanciale, uovo e pecorino"),
-    Dish("Amatriciana", "Pasta con guanciale, pomodoro e pecorino")
-  ]);
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 
-  Course secondo = Course(CourseType.secondo, [
-    Dish("Pollo al forno", "Cosce di pollo al forno"),
-    Dish("Salmone alla griglia", "Filetto di salmone alla griglia")
-  ]);
+import 'application/repository/firebase_order_repository.dart';
+import 'domain/order_package/order.dart' as domain;
+import 'domain/order_package/order_status.dart';
+import 'firebase_option.dart';
 
-  Course dessert = Course(CourseType.dessert, [
-    Dish("Tiramisù", "Dolce al mascarpone e caffè"),
-    Dish("Panna cotta", "Dolce al cucchiaio con coulis di frutti di bosco")
-  ]);
-
-  Menu pranzoOggi = Menu(
-    "Pranzo di oggi",
-    DateTime.now().add(Duration(hours: 2)), // deadline 2 ore da ora
-    [primo, secondo, dessert],
-    MealType.pranzo,
-    DateTime.now().add(Duration(hours: 2)),
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const MyApp());
+}
 
-  // ------------------------
-  // CREAZIONE CLIENTI
-  // ------------------------
-  Client pippo = Client(10, "Pippo", 4, 102); // 4 persone in camera
-  Client pluto = Client(11, "Pluto", 3, 103);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  // ------------------------
-  // CREAZIONE ORDINI
-  // ------------------------
-  // Ordine Pippo
-  Order ordinePippo = Order(pippo, pranzoOggi);
-  try {
-    ordinePippo.addDish(primo.dishes[0]); // Carbonara
-    ordinePippo.addDish(primo.dishes[1]); // Amatriciana
-    ordinePippo.addDish(primo.dishes[0]); // Carbonara di nuovo
-    ordinePippo.addDish(primo.dishes[1]); // Amatriciana di nuovo
-    // Prova ad eccedere numero massimo piatti
-    ordinePippo.addDish(primo.dishes[0]); // Deve scattare eccezione
-  } catch (e) {
-    print("Errore ordine Pippo: $e");
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: OrderRepositoryTestPage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class OrderRepositoryTestPage extends StatefulWidget {
+  const OrderRepositoryTestPage({super.key});
+
+  @override
+  State<OrderRepositoryTestPage> createState() => _OrderRepositoryTestPageState();
+}
+
+class _OrderRepositoryTestPageState extends State<OrderRepositoryTestPage> {
+  late final FirebaseOrderRepository repo;
+
+  final ValueNotifier<String> log = ValueNotifier<String>("");
+
+  StreamSubscription<List<domain.Order>>? menuOrdersSub;
+  StreamSubscription<List<domain.Order>>? clientOrdersSub;
+
+  final String hotelId = "hotel_test_01";
+  final String menuId = "menu_test_01";
+  final String clientId = "client_test_01";
+
+  @override
+  void initState() {
+    super.initState();
+    repo = FirebaseOrderRepository(FirebaseFirestore.instance);
   }
 
-  // Ordine Pluto
-  Order ordinePluto = Order(pluto, pranzoOggi);
-  ordinePluto.addDish(primo.dishes[0]); // Carbonara
-  ordinePluto.addDish(secondo.dishes[1]); // Salmone
-  ordinePluto.addDish(dessert.dishes[0]); // Tiramisù
+  @override
+  void dispose() {
+    menuOrdersSub?.cancel();
+    clientOrdersSub?.cancel();
+    log.dispose();
+    super.dispose();
+  }
 
-  // ------------------------
-  // STAMPA ORDINI E CONTEGGI
-  // ------------------------
-  MenuAggregator aggregator = OrderManager().getAggregator(pranzoOggi);
-  final totals = aggregator.calculateTotals();
+  void _append(String message) {
+    final previous = log.value;
+    log.value = previous.isEmpty ? message : "$previous\n$message";
+  }
 
-  print("\n📊 Totali piatti per il menu '${pranzoOggi.name}':\n");
+  domain.Order _buildTestOrder(String orderId) {
+    return domain.Order(
+      id: orderId,
+      hotelId: hotelId,
+      clientId: clientId,
+      menuId: menuId,
+      status: OrderStatus.confirmed,
+      selections: const {
+        "course_1": ["dish_a", "dish_b"],
+        "course_2": ["dish_c"],
+      },
+    );
+  }
 
-  totals.forEach((course, dishCounts) {
-    print("--- ${course.courseType.toString().split('.').last.toUpperCase()} ---");
-    dishCounts.forEach((dish, count) {
-      print("${dish.name}: $count");
-    });
-    print("");
-  });
+  String _statusLabel(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.confirmed:
+        return "confirmed";
+      case OrderStatus.received:
+        return "received";
+    }
+  }
 
-  // ------------------------
-  // TEST MENU CHIUSO / DEADLINE
-  // ------------------------
-  pranzoOggi.closeMenu();
-  try {
-    Order ordineTest = Order(pippo, pranzoOggi);
-    ordineTest.addDish(primo.dishes[0]);
-  } catch (e) {
-    print("Tentativo dopo chiusura menu: $e");
+  Future<void> _saveOrder() async {
+    try {
+      final orderId = DateTime.now().millisecondsSinceEpoch.toString();
+      final order = _buildTestOrder(orderId);
+
+      await repo.save(order);
+
+      _append(
+        "✅ Salvato ordine: id=${order.id} hotelId=${order.hotelId} menuId=${order.menuId} status=${_statusLabel(order.status)}",
+      );
+    } catch (e) {
+      _append("❌ Errore save(order): $e");
+    }
+  }
+
+  Future<void> _readOrdersByMenu() async {
+    try {
+      final orders = await repo.getByMenu(
+        hotelId: hotelId,
+        menuId: menuId,
+      );
+
+      _append("📚 Letti ${orders.length} ordini per menuId=$menuId");
+
+      for (final order in orders) {
+        _append(
+          "- orderId=${order.id} clientId=${order.clientId} status=${_statusLabel(order.status)} selections=${order.selections}",
+        );
+      }
+    } catch (e) {
+      _append("❌ Errore getByMenu: $e");
+    }
+  }
+
+  Future<void> _readOrdersByClient() async {
+    try {
+      final orders = await repo.getByClient(
+        hotelId: hotelId,
+        clientId: clientId,
+      );
+
+      _append("👤 Letti ${orders.length} ordini per clientId=$clientId");
+
+      for (final order in orders) {
+        _append(
+          "- orderId=${order.id} menuId=${order.menuId} status=${_statusLabel(order.status)}",
+        );
+      }
+    } catch (e) {
+      _append("❌ Errore getByClient: $e");
+    }
+  }
+
+  Future<void> _markLastOrderAsReceived() async {
+    try {
+      final orders = await repo.getByMenu(
+        hotelId: hotelId,
+        menuId: menuId,
+      );
+
+      if (orders.isEmpty) {
+        _append("⚠️ Nessun ordine da aggiornare.");
+        return;
+      }
+
+      final lastOrder = orders.last;
+
+      await repo.updateStatus(
+        hotelId: hotelId,
+        menuId: menuId,
+        orderId: lastOrder.id,
+        status: OrderStatus.received,
+      );
+
+      _append("📩 Ordine aggiornato a received: id=${lastOrder.id}");
+    } catch (e) {
+      _append("❌ Errore updateStatus: $e");
+    }
+  }
+
+  void _startWatchByMenu() {
+    menuOrdersSub?.cancel();
+
+    _append("👀 Avvio watchByMenu(hotelId=$hotelId, menuId=$menuId)...");
+
+    menuOrdersSub = repo.watchByMenu(
+      hotelId: hotelId,
+      menuId: menuId,
+    ).listen(
+          (orders) {
+        _append("🔄 Stream menu update: ${orders.length} ordini");
+      },
+      onError: (e) {
+        _append("❌ Stream watchByMenu error: $e");
+      },
+    );
+  }
+
+  Future<void> _stopWatchByMenu() async {
+    await menuOrdersSub?.cancel();
+    menuOrdersSub = null;
+    _append("⏹️ WatchByMenu fermato.");
+  }
+
+  void _startWatchByClient() {
+    clientOrdersSub?.cancel();
+
+    _append("👀 Avvio watchByClient(hotelId=$hotelId, clientId=$clientId)...");
+
+    clientOrdersSub = repo.watchByClient(
+      hotelId: hotelId,
+      clientId: clientId,
+    ).listen(
+          (orders) {
+        _append("👤 Stream client update: ${orders.length} ordini");
+      },
+      onError: (e) {
+        _append("❌ Stream watchByClient error: $e");
+      },
+    );
+  }
+
+  Future<void> _stopWatchByClient() async {
+    await clientOrdersSub?.cancel();
+    clientOrdersSub = null;
+    _append("⏹️ WatchByClient fermato.");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Test Order Status Management"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                ElevatedButton(
+                  onPressed: _saveOrder,
+                  child: const Text("1) Salva ordine test"),
+                ),
+                ElevatedButton(
+                  onPressed: _readOrdersByMenu,
+                  child: const Text("2) Leggi ordini per menu"),
+                ),
+                ElevatedButton(
+                  onPressed: _readOrdersByClient,
+                  child: const Text("3) Leggi ordini per client"),
+                ),
+                ElevatedButton(
+                  onPressed: _markLastOrderAsReceived,
+                  child: const Text("4) Segna ultimo come received"),
+                ),
+                ElevatedButton(
+                  onPressed: _startWatchByMenu,
+                  child: const Text("5) Avvia watch menu"),
+                ),
+                ElevatedButton(
+                  onPressed: _stopWatchByMenu,
+                  child: const Text("6) Ferma watch menu"),
+                ),
+                ElevatedButton(
+                  onPressed: _startWatchByClient,
+                  child: const Text("7) Avvia watch client"),
+                ),
+                ElevatedButton(
+                  onPressed: _stopWatchByClient,
+                  child: const Text("8) Ferma watch client"),
+                ),
+                OutlinedButton(
+                  onPressed: () => log.value = "",
+                  child: const Text("Pulisci log"),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ValueListenableBuilder<String>(
+                valueListenable: log,
+                builder: (_, value, __) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(
+                        value.isEmpty ? "Log vuoto" : value,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

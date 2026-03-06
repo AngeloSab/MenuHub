@@ -1,42 +1,23 @@
 import 'course.dart';
-import 'course_type.dart';
-import 'meal_type.dart';
-import 'menu_manager.dart';
 
 class Menu {
+  final String id;
+  final String hotelId;
   final DateTime date;
-  final String name;
-  final List<Course> courses;
+  final String mealType;
   final DateTime deadline;
-  final MealType mealType;
-  bool isOpen;
+  final bool isOpen;
+  final List<Course> courses;
 
-  Menu(this.name, this.date, List<Course> courses, this.mealType, this.deadline)
-      : courses = List.unmodifiable(courses),
-        isOpen = true {
-          _validate();
-          MenuManager.addMenu(this);
-  }
+  Menu({
+    required this.id,
+    required this.hotelId,
+    required this.date,
+    required this.mealType,
+    required this.deadline,
+    required this.isOpen,
+    required this.courses,
+  }) : assert(courses.isNotEmpty, "Un menu deve avere almeno un corso");
 
-  void _validate() {
-    if (courses.isEmpty) throw Exception("Il menu deve avere almeno una portata");
 
-    if (deadline.isBefore(DateTime.now())) throw Exception("La deadline è già scaduta");
-
-    final types = <CourseType>{};
-
-    for (final course in courses) {
-      if (!types.add(course.courseType)) {
-        throw Exception("Portata ${course.courseType} duplicata nel menu");
-      }
-    }
-  }
-
-  void closeMenu() {
-    isOpen = false;
-  }
-
-  bool isDeadlinePassed() {
-    return DateTime.now().isAfter(deadline);
-  }
 }

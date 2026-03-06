@@ -1,26 +1,27 @@
-import 'course_type.dart';
 import 'dish.dart';
 
-class Course{
+class Course {
+  final String id;
+  final String type;
   final List<Dish> dishes;
-  final CourseType courseType;
 
-  Course(this.courseType, List<Dish> dishes) : dishes = List.unmodifiable(dishes) {
-    _validate();
-  }
+  const Course({
+    required this.id,
+    required this.type,
+    required this.dishes,
+  }) : assert(dishes.length > 0, "Un corso deve avere almeno un piatto");
 
-  void _validate() {
-    if (dishes.isEmpty) {
-      throw Exception("La portata $courseType deve avere almeno un piatto");
-    }
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "type": type,
+    "dishes": dishes.map((d) => d.toJson()).toList(),
+  };
 
-    final names = <String>{};
-
-    for (final dish in dishes) {
-      if (!names.add(dish.name)) {
-        throw Exception("Piatto ${dish.name} duplicato nella portata $courseType");
-      }
-    }
-  }
-
+  factory Course.fromJson(Map<String, dynamic> json) => Course(
+    id: json["id"],
+    type: json["type"],
+    dishes: (json["dishes"] as List)
+        .map((e) => Dish.fromJson(e))
+        .toList(),
+  );
 }

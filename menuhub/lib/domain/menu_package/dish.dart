@@ -1,13 +1,24 @@
-class Dish{
-  String name;
-  String description;
+class Dish {
+  final String id;
+  final String name;
+  final String description;
 
-  Dish(this.name, this.description);
+  const Dish({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
 
-  set newName(String n) => name = n;
-  set newDescription(String n) => description = n;
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "description": description,
+  };
 
-  void validateDish(){
-    if (name.isEmpty || description.isEmpty) throw Exception("Nome e Descrizione non possono essere vuoti");
-  }
+  factory Dish.fromJson(Map<String, dynamic> json) => Dish(
+    id: json["id"],
+    name: json["name"],
+    description: json["description"],
+  );
+
 }
