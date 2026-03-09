@@ -1,7 +1,7 @@
-import '../domain/menu_package/menu.dart';
-import '../domain/menu_package/course.dart';
-import '../domain/menu_package/dish.dart';
-import '../domain/menu_package/dish_tag.dart';
+import '../../domain/menu_package/menu.dart';
+import '../../domain/menu_package/course.dart';
+import '../../domain/menu_package/dish.dart';
+import '../../domain/menu_package/dish_tag.dart';
 
 Menu createTestMenu() {
   return Menu(
