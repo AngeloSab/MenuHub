@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'application/use_case/create_client_session_uc.dart';
-import 'application/use_case/place_order_uc.dart';
+import 'application/use_cases/client/create_client_session_uc.dart';
+import 'application/use_cases/client/place_order_uc.dart';
 
 import 'application/repository/firebase_client_session_repository.dart';
 import 'application/repository/firebase_order_repository.dart';
-import 'infrastructure/local/client_session_local_repository.dart';
+import 'local/client_session_local_repository.dart';
 
 import 'presentation/client/pages/client_entry_page.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:menuhub/application/use_case/create_guest_session_uc.dart';
-import 'package:menuhub/application/use_case/place_order_uc.dart';
+import 'package:menuhub/application/use_cases/client/create_client_session_uc.dart';
+import 'package:menuhub/application/use_cases/client/place_order_uc.dart';
 import 'package:menuhub/domain/client_package/client_session.dart';
 import 'package:menuhub/domain/menu_package/menu.dart';
-import 'package:menuhub/infrastructure/local/client_session_local_repository.dart';
+import 'package:menuhub/local/client_session_local_repository.dart';
 import 'package:menuhub/presentation/client/controllers/client_entry_controller.dart';
 import 'package:menuhub/presentation/client/pages/client_menu_page.dart';
 import 'package:menuhub/presentation/client/pages/client_session_form_page.dart';
@@ -11,14 +11,14 @@ import 'package:menuhub/presentation/client/pages/client_session_form_page.dart'
 class ClientEntryPage extends StatefulWidget {
   final Menu menu;
   final PlaceOrderUC placeOrderUC;
-  final CreateGuestSessionUC createGuestSessionUC;
+  final CreateClientSessionUC createClientSessionUC;
   final ClientSessionLocalRepository localRepository;
 
   const ClientEntryPage({
     super.key,
     required this.menu,
     required this.placeOrderUC,
-    required this.createGuestSessionUC,
+    required this.createClientSessionUC,
     required this.localRepository,
   });
 
@@ -93,7 +93,7 @@ class _ClientEntryPageState extends State<ClientEntryPage> {
         builder: (_) => ClientSessionFormPage(
           menu: widget.menu,
           placeOrderUC: widget.placeOrderUC,
-          createGuestSessionUC: widget.createGuestSessionUC,
+          createClientSessionUC: widget.createClientSessionUC,
           localRepository: widget.localRepository,
           hotelId: hotelIdFromUrl,
         ),

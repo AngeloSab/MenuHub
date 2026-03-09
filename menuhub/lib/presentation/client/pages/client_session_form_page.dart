@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:menuhub/application/use_case/create_guest_session_uc.dart';
-import 'package:menuhub/application/use_case/place_order_uc.dart';
+import 'package:menuhub/application/use_cases/client/create_client_session_uc.dart';
+import 'package:menuhub/application/use_cases/client/place_order_uc.dart';
 import 'package:menuhub/domain/menu_package/menu.dart';
-import 'package:menuhub/infrastructure/local/client_session_local_repository.dart';
+import 'package:menuhub/local/client_session_local_repository.dart';
 import 'package:menuhub/presentation/client/controllers/client_session_controller.dart';
 import 'package:menuhub/presentation/client/pages/client_menu_page.dart';
 
@@ -10,7 +10,7 @@ class ClientSessionFormPage extends StatefulWidget {
   final Menu menu;
   final String hotelId;
   final PlaceOrderUC placeOrderUC;
-  final CreateGuestSessionUC createGuestSessionUC;
+  final CreateClientSessionUC createClientSessionUC;
   final ClientSessionLocalRepository localRepository;
 
   const ClientSessionFormPage({
@@ -18,7 +18,7 @@ class ClientSessionFormPage extends StatefulWidget {
     required this.menu,
     required this.hotelId,
     required this.placeOrderUC,
-    required this.createGuestSessionUC,
+    required this.createClientSessionUC,
     required this.localRepository,
   });
 
@@ -45,7 +45,7 @@ class _ClientSessionFormPageState extends State<ClientSessionFormPage> {
 
     _controller = ClientSessionController(
       hotelId: widget.hotelId,
-      createGuestSessionUC: widget.createGuestSessionUC,
+      createClientSessionUC: widget.createClientSessionUC,
       localRepository: widget.localRepository,
     );
 
