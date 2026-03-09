@@ -1,24 +1,27 @@
 import '../order_package/order.dart';
+import '../order_package/order_selection.dart';
 import '../order_package/order_status.dart';
 
 class OrderBuilder {
   final String hotelId;
   final String id;
-  final String clientId;
+  final String clientSessionId;
+  final String reservationName;
+  final String roomNumber;
   final String menuId;
-
-  final Map<String, List<String>> _selections = {};
+  final List<OrderSelection> _selections = [];
 
   OrderBuilder({
     required this.hotelId,
     required this.id,
-    required this.clientId,
+    required this.clientSessionId,
+    required this.reservationName,
+    required this.roomNumber,
     required this.menuId,
   });
 
-  void addDish(String courseId, String dishId) {
-    _selections.putIfAbsent(courseId, () => []);
-    _selections[courseId]!.add(dishId);
+  void addDish(OrderSelection item) {
+    _selections.add(item);
   }
 
   Order build() {
@@ -29,10 +32,12 @@ class OrderBuilder {
     return Order(
       hotelId: hotelId,
       id: id,
-      clientId: clientId,
+      clientSessionId: clientSessionId,
+      reservationName: reservationName,
+      roomNumber: roomNumber,
       menuId: menuId,
       status: OrderStatus.confirmed,
-      selections: Map.unmodifiable(_selections),
+      selections: List.unmodifiable(_selections),
     );
   }
 }

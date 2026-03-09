@@ -1,0 +1,4 @@
+enum StaffRole {
+  manager,
+  staff
+}

@@ -10,108 +10,78 @@ class FirebaseOrderRepository implements OrderRepository {
 
   FirebaseOrderRepository(this.firestore);
 
-  CollectionReference<Map<String, dynamic>> _ordersRef({
-    required String hotelId,
-    required String menuId,
-  }) {
+  @override
+  Future<void> save(domain.Order order) async {
+    await firestore
+        .collection('hotels')
+        .doc(order.hotelId)
+        .collection('menus')
+        .doc(order.menuId)
+        .collection('orders')
+        .doc(order.id)
+        .set(OrderFirestoreMapper.toFirestore(order));
+  }
+
+  @override
+  Future<List<domain.Order>> getByMenu(String hotelId, String menuId) async {
+    final snapshot = await firestore
+        .collection('hotels')
+        .doc(hotelId)
+        .collection('menus')
+        .doc(menuId)
+        .collection('orders')
+        .get();
+
+    return snapshot.docs
+        .map(
+          (doc) => OrderFirestoreMapper.fromFirestore(
+        docId: doc.id,
+        data: doc.data(),
+      ),
+    )
+        .toList();
+  }
+
+  @override
+  Stream<List<domain.Order>> watchByMenu(String hotelId, String menuId) {
     return firestore
         .collection('hotels')
         .doc(hotelId)
         .collection('menus')
         .doc(menuId)
-        .collection('orders');
-  }
-
-  Query<Map<String, dynamic>> _ordersGroupRef() {
-    return firestore.collectionGroup('orders');
-  }
-
-  @override
-  Future<void> save(domain.Order order) async {
-    try {
-      await _ordersRef(
-        hotelId: order.hotelId,
-        menuId: order.menuId,
-      ).doc(order.id).set(
-        OrderFirestoreMapper.toFirestore(order),
-      );
-    } on FirebaseException catch (e) {
-      throw Exception(
-        'Errore Firestore in save(orderId=${order.id}): ${e.message}',
-      );
-    }
-  }
-
-  @override
-  Future<List<domain.Order>> getByMenu({
-    required String hotelId,
-    required String menuId,
-  }) async {
-    try {
-      final snapshot = await _ordersRef(
-        hotelId: hotelId,
-        menuId: menuId,
-      ).get();
-
-      return snapshot.docs
+        .collection('orders')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
           .map(
             (doc) => OrderFirestoreMapper.fromFirestore(
           docId: doc.id,
           data: doc.data(),
         ),
       )
-          .toList();
-    } on FirebaseException catch (e) {
-      throw Exception(
-        'Errore Firestore in getByMenu(hotelId=$hotelId, menuId=$menuId): ${e.message}',
-      );
-    }
+          .toList(),
+    );
   }
 
   @override
-  Stream<List<domain.Order>> watchByMenu({
-    required String hotelId,
-    required String menuId,
-  }) {
-    return _ordersRef(
-      hotelId: hotelId,
-      menuId: menuId,
-    ).snapshots().map((snapshot) {
-      return snapshot.docs
-          .map(
-            (doc) => OrderFirestoreMapper.fromFirestore(
-          docId: doc.id,
-          data: doc.data(),
-        ),
-      )
-          .toList();
-    });
-  }
+  Future<domain.Order?> getById(String hotelId, String menuId, String orderId) async {
+    final doc = await firestore
+        .collection('hotels')
+        .doc(hotelId)
+        .collection('menus')
+        .doc(menuId)
+        .collection('orders')
+        .doc(orderId)
+        .get();
 
-  @override
-  Future<domain.Order?> getById({
-    required String hotelId,
-    required String menuId,
-    required String orderId,
-  }) async {
-    try {
-      final doc = await _ordersRef(
-        hotelId: hotelId,
-        menuId: menuId,
-      ).doc(orderId).get();
-
-      final data = doc.data();
-      if (data == null) return null;
-
-      return OrderFirestoreMapper.fromFirestore(
-        docId: doc.id,
-        data: data,
-      );
-    } on FirebaseException catch (e) {
-      throw Exception(
-        'Errore Firestore in getById(hotelId=$hotelId, menuId=$menuId, orderId=$orderId): ${e.message}',
-      );
+    if (!doc.exists || doc.data() == null) {
+      return null;
     }
+
+    return OrderFirestoreMapper.fromFirestore(
+      docId: doc.id,
+      data: doc.data()!,
+    );
   }
 
   @override
@@ -121,63 +91,87 @@ class FirebaseOrderRepository implements OrderRepository {
     required String orderId,
     required OrderStatus status,
   }) async {
-    try {
-      await _ordersRef(
-        hotelId: hotelId,
-        menuId: menuId,
-      ).doc(orderId).update({
-        'status': _statusToString(status),
-      });
-    } on FirebaseException catch (e) {
-      throw Exception(
-        'Errore Firestore in updateStatus(hotelId=$hotelId, menuId=$menuId, orderId=$orderId): ${e.message}',
-      );
-    }
-  }
-
-  Future<List<domain.Order>> getByClient({
-    required String hotelId,
-    required String clientId,
-  }) async {
-    try {
-      final snapshot = await _ordersGroupRef()
-          .where('hotelId', isEqualTo: hotelId)
-          .where('clientId', isEqualTo: clientId)
-          .get();
-
-      return snapshot.docs
-          .map(
-            (doc) => OrderFirestoreMapper.fromFirestore(
-          docId: doc.id,
-          data: doc.data(),
-        ),
-      )
-          .toList();
-    } on FirebaseException catch (e) {
-      throw Exception(
-        'Errore Firestore in getByClient(hotelId=$hotelId, clientId=$clientId): ${e.message}',
-      );
-    }
-  }
-
-  Stream<List<domain.Order>> watchByClient({
-    required String hotelId,
-    required String clientId,
-  }) {
-    return _ordersGroupRef()
-        .where('hotelId', isEqualTo: hotelId)
-        .where('clientId', isEqualTo: clientId)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs
-          .map(
-            (doc) => OrderFirestoreMapper.fromFirestore(
-          docId: doc.id,
-          data: doc.data(),
-        ),
-      )
-          .toList();
+    await firestore
+        .collection('hotels')
+        .doc(hotelId)
+        .collection('menus')
+        .doc(menuId)
+        .collection('orders')
+        .doc(orderId)
+        .update({
+      'status': _statusToString(status),
     });
+  }
+
+  @override
+  Future<List<domain.Order>> getByClientSession(
+      String hotelId,
+      String clientSessionId,
+      ) async {
+    final snapshot = await firestore
+        .collectionGroup('orders')
+        .where('hotelId', isEqualTo: hotelId)
+        .where('clientSessionId', isEqualTo: clientSessionId)
+        .get();
+
+    return snapshot.docs
+        .map(
+          (doc) => OrderFirestoreMapper.fromFirestore(
+        docId: doc.id,
+        data: doc.data(),
+      ),
+    )
+        .toList();
+  }
+
+  @override
+  Future<domain.Order?> getByMenuAndClientSession(
+      String hotelId,
+      String menuId,
+      String clientSessionId,
+      ) async {
+    final snapshot = await firestore
+        .collection('hotels')
+        .doc(hotelId)
+        .collection('menus')
+        .doc(menuId)
+        .collection('orders')
+        .where('clientSessionId', isEqualTo: clientSessionId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return null;
+    }
+
+    final doc = snapshot.docs.first;
+
+    return OrderFirestoreMapper.fromFirestore(
+      docId: doc.id,
+      data: doc.data(),
+    );
+  }
+
+  @override
+  Stream<List<domain.Order>> watchByClientSession(
+      String hotelId,
+      String clientSessionId,
+      ) {
+    return firestore
+        .collectionGroup('orders')
+        .where('hotelId', isEqualTo: hotelId)
+        .where('clientSessionId', isEqualTo: clientSessionId)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+          .map(
+            (doc) => OrderFirestoreMapper.fromFirestore(
+          docId: doc.id,
+          data: doc.data(),
+        ),
+      )
+          .toList(),
+    );
   }
 
   String _statusToString(OrderStatus status) {

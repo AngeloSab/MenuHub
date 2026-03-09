@@ -1,15 +1,25 @@
-import '../../domain/menu_package/dish.dart';
+import '../domain/menu_package/dish.dart';
+import '../domain/menu_package/dish_tag.dart';
 
 class DishFirestoreMapper {
-  static Map<String, dynamic> toMap(Dish dish) => {
-    'id': dish.id,
-    'name': dish.name,
-    'description': dish.description,
-  };
 
-  static Dish fromMap(Map<String, dynamic> json) => Dish(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    description: json['description'] as String,
-  );
+  static Map<String, dynamic> toFirestore(Dish dish) {
+    return {
+      "id": dish.id,
+      "name": dish.name,
+      "description": dish.description,
+      "dishTags": dish.dishTags.map((t) => t.name).toList(),
+    };
+  }
+
+  static Dish fromFirestore(Map<String, dynamic> data) {
+    return Dish(
+      id: data["id"],
+      name: data["name"],
+      description: data["description"],
+      dishTags: (data["dishTags"] as List)
+          .map((e) => DishTag.values.firstWhere((t) => t.name == e))
+          .toList(),
+    );
+  }
 }

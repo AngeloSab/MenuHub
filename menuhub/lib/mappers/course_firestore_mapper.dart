@@ -1,20 +1,24 @@
-import '../../domain/menu_package/course.dart';
+import '../domain/menu_package/course.dart';
 import 'dish_firestore_mapper.dart';
 
 class CourseFirestoreMapper {
-  static Map<String, dynamic> toMap(Course course) => {
-    'id': course.id,
-    'type': course.type,
-    'dishes': course.dishes.map(DishFirestoreMapper.toMap).toList(),
-  };
+  static Map<String, dynamic> toFirestore(Course course) {
+    return {
+      'id': course.id,
+      'type': course.type,
+      'dishes': course.dishes.map(DishFirestoreMapper.toFirestore).toList(),
+    };
+  }
 
-  static Course fromMap(Map<String, dynamic> json) => Course(
-    id: json['id'] as String,
-    type: json['type'] as String,
-    dishes: (json['dishes'] as List)
-        .map((e) => DishFirestoreMapper.fromMap(
-      Map<String, dynamic>.from(e),
-    ))
-        .toList(),
-  );
+  static Course fromFirestore(Map<String, dynamic> data) {
+    return Course(
+      id: data['id'] as String,
+      type: data['type'] as String,
+      dishes: (data['dishes'] as List)
+          .map((e) => DishFirestoreMapper.fromFirestore(
+        Map<String, dynamic>.from(e),
+      ))
+          .toList(),
+    );
+  }
 }

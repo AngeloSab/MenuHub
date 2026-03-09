@@ -1,19 +1,24 @@
-import 'package:menuhub/domain/order_package/order_status.dart';
+import 'order_selection.dart';
+import 'order_status.dart';
 
 class Order {
-  final String hotelId;
   final String id;
-  final String clientId;
+  final String hotelId;
+  final String clientSessionId;
+  final String reservationName;
   final String menuId;
+  final String roomNumber;
   final OrderStatus status;
-  final Map<String, List<String>> selections;
+  final List<OrderSelection> selections;
 
-  const Order({
-    required this.hotelId,
+  Order({
     required this.id,
-    required this.clientId,
+    required this.hotelId,
+    required this.clientSessionId,
+    required this.reservationName,
     required this.menuId,
+    required this.roomNumber,
     required this.status,
     required this.selections,
-  });
+  }) : assert(selections.isNotEmpty, "Un ordine deve contenere almeno una selezione");
 }

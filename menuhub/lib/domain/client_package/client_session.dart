@@ -1,11 +1,11 @@
-class Client {
+class ClientSession {
   final String id;
   final String hotelId;
   final String name;
   final int peopleCount;
   final String roomNumber;
 
-  const Client({
+  ClientSession({
     required this.id,
     required this.hotelId,
     required this.name,

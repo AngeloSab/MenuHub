@@ -4,42 +4,6 @@
     <option name="deviceSelectionList">
       <list>
         <PersistentDeviceSelectionData>
-          <option name="api" value="33" />
-          <option name="brand" value="samsung" />
-          <option name="codename" value="b0q" />
-          <option name="id" value="b0q" />
-          <option name="manufacturer" value="Samsung" />
-          <option name="name" value="Galaxy S22 Ultra" />
-          <option name="screenDensity" value="600" />
-          <option name="screenX" value="1440" />
-          <option name="screenY" value="3088" />
-          <option name="selected" value="true" />
-        </PersistentDeviceSelectionData>
-        <PersistentDeviceSelectionData>
-          <option name="api" value="33" />
-          <option name="brand" value="google" />
-          <option name="codename" value="felix" />
-          <option name="id" value="felix" />
-          <option name="manufacturer" value="Google" />
-          <option name="name" value="Pixel Fold" />
-          <option name="screenDensity" value="420" />
-          <option name="screenX" value="2208" />
-          <option name="screenY" value="1840" />
-          <option name="selected" value="true" />
-        </PersistentDeviceSelectionData>
-        <PersistentDeviceSelectionData>
-          <option name="api" value="33" />
-          <option name="brand" value="samsung" />
-          <option name="codename" value="gts8uwifi" />
-          <option name="id" value="gts8uwifi" />
-          <option name="manufacturer" value="Samsung" />
-          <option name="name" value="Galaxy Tab S8 Ultra" />
-          <option name="screenDensity" value="320" />
-          <option name="screenX" value="1848" />
-          <option name="screenY" value="2960" />
-          <option name="selected" value="true" />
-        </PersistentDeviceSelectionData>
-        <PersistentDeviceSelectionData>
           <option name="api" value="34" />
           <option name="brand" value="google" />
           <option name="codename" value="shiba" />
@@ -415,6 +379,17 @@
           <option name="screenY" value="1600" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
+          <option name="api" value="33" />
+          <option name="brand" value="samsung" />
+          <option name="codename" value="b0q" />
+          <option name="id" value="b0q" />
+          <option name="manufacturer" value="Samsung" />
+          <option name="name" value="Galaxy S22 Ultra" />
+          <option name="screenDensity" value="600" />
+          <option name="screenX" value="1440" />
+          <option name="screenY" value="3088" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
           <option name="api" value="36" />
           <option name="brand" value="samsung" />
           <option name="codename" value="b0q" />
@@ -690,6 +665,17 @@
           <option name="screenY" value="384" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
+          <option name="api" value="33" />
+          <option name="brand" value="google" />
+          <option name="codename" value="felix" />
+          <option name="id" value="felix" />
+          <option name="manufacturer" value="Google" />
+          <option name="name" value="Pixel Fold" />
+          <option name="screenDensity" value="420" />
+          <option name="screenX" value="2208" />
+          <option name="screenY" value="1840" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
           <option name="api" value="34" />
           <option name="brand" value="google" />
           <option name="codename" value="felix" />
@@ -767,6 +753,17 @@
           <option name="screenY" value="2340" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
+          <option name="api" value="33" />
+          <option name="brand" value="motorola" />
+          <option name="codename" value="gnevan" />
+          <option name="id" value="gnevan" />
+          <option name="manufacturer" value="Motorola" />
+          <option name="name" value="moto g stylus (2023)" />
+          <option name="screenDensity" value="280" />
+          <option name="screenX" value="720" />
+          <option name="screenY" value="1600" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
           <option name="api" value="34" />
           <option name="brand" value="samsung" />
           <option name="codename" value="gta9pwifi" />
@@ -798,6 +795,17 @@
           <option name="screenDensity" value="340" />
           <option name="screenX" value="1600" />
           <option name="screenY" value="2560" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
+          <option name="api" value="33" />
+          <option name="brand" value="samsung" />
+          <option name="codename" value="gts8uwifi" />
+          <option name="id" value="gts8uwifi" />
+          <option name="manufacturer" value="Samsung" />
+          <option name="name" value="Galaxy Tab S8 Ultra" />
+          <option name="screenDensity" value="320" />
+          <option name="screenX" value="1848" />
+          <option name="screenY" value="2960" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
           <option name="api" value="34" />
@@ -1106,6 +1114,17 @@
           <option name="screenDensity" value="420" />
           <option name="screenX" value="1856" />
           <option name="screenY" value="2160" />
+        </PersistentDeviceSelectionData>
+        <PersistentDeviceSelectionData>
+          <option name="api" value="36" />
+          <option name="brand" value="samsung" />
+          <option name="codename" value="r0qcsx" />
+          <option name="id" value="r0qcsx" />
+          <option name="manufacturer" value="Samsung" />
+          <option name="name" value="S22" />
+          <option name="screenDensity" value="480" />
+          <option name="screenX" value="1080" />
+          <option name="screenY" value="2340" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
           <option name="api" value="30" />
