@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:menuhub/application/use_case/create_guest_session_uc.dart';
-import 'package:menuhub/application/use_case/place_order_uc.dart';
-import 'package:menuhub/domain/client_package/client_session.dart';
-import 'package:menuhub/domain/menu_package/menu.dart';
-import 'package:menuhub/infrastructure/local/client_session_local_repository.dart';
+import 'package:menuhub/application/use_cases/client/create_client_session_uc.dart';
+import 'package:menuhub/application/use_cases/client/get_open_menus_uc.dart';
+import 'package:menuhub/application/use_cases/client/place_order_uc.dart';
 import 'package:menuhub/presentation/client/controllers/client_entry_controller.dart';
 import 'package:menuhub/presentation/client/pages/client_menu_page.dart';
 import 'package:menuhub/presentation/client/pages/client_session_form_page.dart';
+import '../../../local/client_session_local_repository.dart';
+import '../models/client_entry_resolution.dart';
 
 class ClientEntryPage extends StatefulWidget {
-  final Menu menu;
+  final GetOpenMenusUC getOpenMenusUC;
   final PlaceOrderUC placeOrderUC;
-  final CreateGuestSessionUC createGuestSessionUC;
+  final CreateClientSessionUC createClientSessionUC;
   final ClientSessionLocalRepository localRepository;
 
   const ClientEntryPage({
     super.key,
-    required this.menu,
+    required this.getOpenMenusUC,
     required this.placeOrderUC,
-    required this.createGuestSessionUC,
+    required this.createClientSessionUC,
     required this.localRepository,
   });
 
@@ -34,6 +34,7 @@ class _ClientEntryPageState extends State<ClientEntryPage> {
     super.initState();
 
     _controller = ClientEntryController(
+      getOpenMenusUC: widget.getOpenMenusUC,
       loadSavedClientSessionByHotelId: widget.localRepository.loadByHotelId,
     );
 
@@ -58,29 +59,17 @@ class _ClientEntryPageState extends State<ClientEntryPage> {
   }
 
   Future<void> _resolveFlow() async {
-    final hotelIdFromUrl = _controller.readHotelIdFromUrl();
+    final ClientEntryResolution resolution =
+    await _controller.resolveEntryFlow();
 
     if (!mounted) return;
 
-    if (hotelIdFromUrl == null) {
-      return;
-    }
-
-    ClientSession? savedSession;
-    try {
-      savedSession = await _controller.resolveSavedClientSession(hotelIdFromUrl);
-    } catch (_) {
-      return;
-    }
-
-    if (!mounted) return;
-
-    if (savedSession != null) {
+    if (resolution.shouldOpenMenu) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => ClientMenuPage(
-            menu: widget.menu,
-            clientSession: savedSession,
+            menu: resolution.menu!,
+            clientSession: resolution.clientSession!,
             placeOrderUC: widget.placeOrderUC,
           ),
         ),
@@ -88,17 +77,22 @@ class _ClientEntryPageState extends State<ClientEntryPage> {
       return;
     }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => ClientSessionFormPage(
-          menu: widget.menu,
-          placeOrderUC: widget.placeOrderUC,
-          createGuestSessionUC: widget.createGuestSessionUC,
-          localRepository: widget.localRepository,
-          hotelId: hotelIdFromUrl,
+    if (resolution.shouldOpenForm) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => ClientSessionFormPage(
+            menu: resolution.menu!,
+            hotelId: resolution.hotelId!,
+            placeOrderUC: widget.placeOrderUC,
+            createClientSessionUC: widget.createClientSessionUC,
+            localRepository: widget.localRepository,
+          ),
         ),
-      ),
-    );
+      );
+      return;
+    }
+
+    setState(() {});
   }
 
   @override
@@ -110,40 +104,29 @@ class _ClientEntryPageState extends State<ClientEntryPage> {
       body: Center(
         child: _controller.isLoading
             ? const CircularProgressIndicator()
-            : errorMessage != null
-                ? Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline_rounded,
-                          size: 48,
-                          color: Color(0xFF8B5E3C),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Impossibile aprire il menu',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF2E2E2E),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          errorMessage,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Color(0xFF6B6B6B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : const SizedBox.shrink(),
+            : Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.info_outline_rounded,
+                size: 48,
+                color: Color(0xFF8B5E3C),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                errorMessage ?? 'Nessun menu disponibile al momento',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF2E2E2E),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

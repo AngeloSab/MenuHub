@@ -1,8 +1,10 @@
+import 'package:menuhub/domain/menu_package/course_type.dart';
+
 import 'dish.dart';
 
 class Course {
   final String id;
-  final String type;
+  final CourseType type;
   final List<Dish> dishes;
 
   const Course({

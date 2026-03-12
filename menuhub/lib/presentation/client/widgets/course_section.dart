@@ -39,7 +39,7 @@ class CourseSection extends StatelessWidget {
       child: Column(
         children: [
           CourseHeader(
-            title: course.type,
+            title: course.type.name,
             orderedCount: orderedCount,
           ),
           const SizedBox(height: 14),

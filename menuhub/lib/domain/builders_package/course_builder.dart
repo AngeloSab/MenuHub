@@ -1,9 +1,11 @@
+import 'package:menuhub/domain/menu_package/course_type.dart';
+
 import '../menu_package/course.dart';
 import '../menu_package/dish.dart';
 
 class CourseBuilder {
   final String id;
-  final String type;
+  final CourseType type;
   final List<Dish> _dishes = [];
 
   CourseBuilder({

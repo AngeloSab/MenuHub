@@ -1,3 +1,5 @@
+import 'package:menuhub/domain/menu_package/meal_type.dart';
+
 import '../menu_package/course.dart';
 import '../menu_package/menu.dart';
 
@@ -5,7 +7,7 @@ class MenuBuilder {
   final String id;
   final String hotelId;
   final DateTime date;
-  final String mealType;
+  final MealType mealType;
   final DateTime deadline;
 
   final List<Course> _courses = [];
@@ -33,7 +35,7 @@ class MenuBuilder {
       date: date,
       mealType: mealType,
       deadline: deadline,
-      isOpen: true,
+      isOpen: false,
       courses: List.unmodifiable(_courses),
     );
   }

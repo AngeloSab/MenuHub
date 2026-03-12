@@ -1,10 +1,12 @@
+import 'package:menuhub/domain/menu_package/meal_type.dart';
+
 import 'course.dart';
 
 class Menu {
   final String id;
   final String hotelId;
   final DateTime date;
-  final String mealType;
+  final MealType mealType;
   final DateTime deadline;
   final bool isOpen;
   final List<Course> courses;

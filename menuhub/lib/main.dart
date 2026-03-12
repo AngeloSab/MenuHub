@@ -1,44 +1,50 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'application/use_case/create_client_session_uc.dart';
-import 'application/use_case/place_order_uc.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'application/repository/firebase_menu_repository.dart';
+import 'application/use_cases/staff/close_menu_uc.dart';
+import 'application/use_cases/staff/create_menu_uc.dart';
+import 'application/use_cases/staff/get_menu_by_id_uc.dart';
+import 'application/use_cases/staff/open_menu_uc.dart';
+import 'application/use_cases/staff/watch_menus_by_hotel_uc.dart';
+import 'firebase_option.dart';
+import 'presentation/hotel/manager/controllers/menu_list_controller.dart';
+import 'presentation/hotel/manager/pages/menu_list_page.dart';
 
-import 'application/repository/firebase_client_session_repository.dart';
-import 'application/repository/firebase_order_repository.dart';
-import 'infrastructure/local/client_session_local_repository.dart';
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-import 'presentation/client/pages/client_entry_page.dart';
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-import 'domain/menu_package/menu.dart';
-
-void main() {
-  runApp(const MenuHubApp());
+  runApp(const ManagerRefactorTestApp());
 }
 
-class MenuHubApp extends StatelessWidget {
-  const MenuHubApp({super.key});
+class ManagerRefactorTestApp extends StatelessWidget {
+  const ManagerRefactorTestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final firestore = FirebaseFirestore.instance;
-
-    final clientSessionRepository = FirebaseClientSessionRepository(firestore);
-    final orderRepository = FirebaseOrderRepository(firestore);
-
-    final createClientSessionUC = CreateClientSessionUC(clientSessionRepository);
-    final placeOrderUC = PlaceOrderUC(orderRepository);
-
-    final localSessionRepository = ClientSessionLocalRepository();
-
-    final Menu testMenu = createTestMenu();
+    final menuRepository = FirebaseMenuRepository(firestore);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ClientEntryPage(
-        menu: testMenu,
-        placeOrderUC: placeOrderUC,
-        createClientSessionUC: createClientSessionUC,
-        localRepository: localSessionRepository,
+      title: 'MenuHub Manager Refactor Test',
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
+      home: MenuListPage(
+        controller: MenuListController(
+          watchMenusByHotelUC: WatchMenusByHotelUC(menuRepository),
+          openMenuUC: OpenMenuUC(menuRepository),
+          closeMenuUC: CloseMenuUC(menuRepository),
+        ),
+        hotelId: 'hotel_test_01',
+        getMenuByIdUC: GetMenuByIdUC(menuRepository),
+        createMenuUC: CreateMenuUC(menuRepository),
+        updateMenuUC: CreateMenuUC(menuRepository),
       ),
     );
   }

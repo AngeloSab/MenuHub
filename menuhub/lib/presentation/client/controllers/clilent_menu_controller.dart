@@ -5,7 +5,7 @@ import 'package:menuhub/domain/order_package/order.dart';
 import 'package:menuhub/domain/order_package/order_selection.dart';
 import '../../../application/use_cases/client/place_order_uc.dart';
 import '../../../domain/client_package/client_session.dart';
-import '../model/client_menu_model.dart';
+import '../models/client_menu_model.dart';
 
 class ClientMenuController extends ChangeNotifier {
   final Menu menu;

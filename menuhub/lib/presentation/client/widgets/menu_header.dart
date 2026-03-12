@@ -18,7 +18,7 @@ class MenuHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedDate = DateFormat('dd/MM/yyyy').format(menu.date);
-    final mealTypeLabel = _capitalize(menu.mealType);
+    final mealTypeLabel = _capitalize(menu.mealType.toString());
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
