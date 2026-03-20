@@ -50,7 +50,9 @@ class FirebaseMenuRepository implements MenuRepository {
   @override
   Future<List<Menu>> getByHotel(String hotelId) async {
     try {
-      final snapshot = await _menusRef(hotelId).get();
+      final snapshot = await _menusRef(hotelId)
+          .where('isArchived', isEqualTo: false)
+          .get();
 
       return snapshot.docs
           .map(
@@ -69,7 +71,10 @@ class FirebaseMenuRepository implements MenuRepository {
 
   @override
   Stream<List<Menu>> watchByHotel(String hotelId) {
-    return _menusRef(hotelId).snapshots().map((snapshot) {
+    return _menusRef(hotelId)
+        .where('isArchived', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs
           .map(
             (doc) => MenuFirestoreMapper.fromFirestore(
@@ -84,8 +89,10 @@ class FirebaseMenuRepository implements MenuRepository {
   @override
   Future<List<Menu>> getOpenMenus(String hotelId) async {
     try {
-      final snapshot =
-      await _menusRef(hotelId).where('isOpen', isEqualTo: true).get();
+      final snapshot = await _menusRef(hotelId)
+          .where('isOpen', isEqualTo: true)
+          .where('isArchived', isEqualTo: false)
+          .get();
 
       return snapshot.docs
           .map(
@@ -106,6 +113,7 @@ class FirebaseMenuRepository implements MenuRepository {
   Stream<List<Menu>> watchOpenMenus(String hotelId) {
     return _menusRef(hotelId)
         .where('isOpen', isEqualTo: true)
+        .where('isArchived', isEqualTo: false)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
@@ -147,6 +155,37 @@ class FirebaseMenuRepository implements MenuRepository {
     } on FirebaseException catch (e) {
       throw Exception(
         'Errore Firestore in closeMenu(hotelId=$hotelId, menuId=$menuId): ${e.message}',
+      );
+    }
+  }
+
+  @override
+  Future<void> delete({
+    required String hotelId,
+    required String menuId,
+  }) async {
+    try {
+      await _menusRef(hotelId).doc(menuId).delete();
+    } on FirebaseException catch (e) {
+      throw Exception(
+        'Errore Firestore in delete(hotelId=$hotelId, menuId=$menuId): ${e.message}',
+      );
+    }
+  }
+
+  @override
+  Future<void> archive({
+    required String hotelId,
+    required String menuId,
+  }) async {
+    try {
+      await _menusRef(hotelId).doc(menuId).update({
+        'isArchived': true,
+        'isOpen': false,
+      });
+    } on FirebaseException catch (e) {
+      throw Exception(
+        'Errore Firestore in archive(hotelId=$hotelId, menuId=$menuId): ${e.message}',
       );
     }
   }

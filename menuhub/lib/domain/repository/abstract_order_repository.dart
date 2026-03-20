@@ -23,6 +23,10 @@ abstract class OrderRepository {
       String clientSessionId,
       );
 
+  Future<int> countByMenu({
+    required String hotelId,
+    required String menuId,
+  });
 
   Future<List<Order>> getByClientSession(String hotelId, String clientSessionId);
 

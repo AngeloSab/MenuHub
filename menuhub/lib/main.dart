@@ -2,7 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'application/repository/firebase_menu_repository.dart';
+import 'application/repository/firebase_order_repository.dart';
 import 'application/use_cases/staff/close_menu_uc.dart';
+import 'application/use_cases/staff/archive_menu_uc.dart';
+import 'application/use_cases/staff/get_menu_orders_count_uc.dart';
+import 'application/use_cases/staff/delete_menu_uc.dart';
 import 'application/use_cases/staff/create_menu_uc.dart';
 import 'application/use_cases/staff/get_menu_by_id_uc.dart';
 import 'application/use_cases/staff/open_menu_uc.dart';
@@ -28,6 +32,7 @@ class ManagerRefactorTestApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final firestore = FirebaseFirestore.instance;
     final menuRepository = FirebaseMenuRepository(firestore);
+    final orderRepository = FirebaseOrderRepository(firestore);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -40,6 +45,9 @@ class ManagerRefactorTestApp extends StatelessWidget {
           watchMenusByHotelUC: WatchMenusByHotelUC(menuRepository),
           openMenuUC: OpenMenuUC(menuRepository),
           closeMenuUC: CloseMenuUC(menuRepository),
+          deleteMenuUC: DeleteMenuUC(menuRepository),
+          getMenuOrdersCountUC: GetMenuOrdersCountUC(orderRepository),
+          archiveMenuUC: ArchiveMenuUC(menuRepository)
         ),
         hotelId: 'hotel_test_01',
         getMenuByIdUC: GetMenuByIdUC(menuRepository),

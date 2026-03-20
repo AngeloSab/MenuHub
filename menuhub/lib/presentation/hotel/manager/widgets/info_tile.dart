@@ -20,44 +20,85 @@ class InfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(HotelRadius.input),
+      borderRadius: BorderRadius.circular(HotelRadius.button),
       onTap: onTap,
       child: Ink(
-        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: HotelColors.secondary.withOpacity(0.18),
+          borderRadius: BorderRadius.circular(HotelRadius.button),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              HotelColors.cardBackground,
+              HotelColors.surfaceBlue,
+            ],
           ),
-          borderRadius: BorderRadius.circular(HotelRadius.input),
+          border: Border.all(
+            color: HotelColors.borderSoft,
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: HotelColors.secondary),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: HotelColors.primary.withOpacity(0.10),
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                ),
+                child: Icon(
+                  icon,
+                  color: HotelColors.primary,
+                  size: 20,
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: HotelColors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        color: HotelColors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: HotelColors.secondary.withOpacity(0.08),
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                ),
+                child: const Icon(
+                  Icons.chevron_right,
+                  color: HotelColors.secondary,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

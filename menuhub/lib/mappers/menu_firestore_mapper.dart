@@ -11,6 +11,7 @@ class MenuFirestoreMapper {
     'mealType': menu.mealType.name,
     'deadline': Timestamp.fromDate(menu.deadline),
     'isOpen': menu.isOpen,
+    'isArchived' : menu.isArchived,
     'courses': menu.courses.map(CourseFirestoreMapper.toFirestore).toList(),
   };
 
@@ -28,6 +29,7 @@ class MenuFirestoreMapper {
       ),
       deadline: (data['deadline'] as Timestamp).toDate(),
       isOpen: data['isOpen'] as bool,
+      isArchived: data['isArchived'] as bool,
       courses: (data['courses'] as List)
           .map((e) => CourseFirestoreMapper.fromFirestore(
         Map<String, dynamic>.from(e),

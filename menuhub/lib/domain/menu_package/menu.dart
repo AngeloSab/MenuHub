@@ -10,6 +10,7 @@ class Menu {
   final DateTime deadline;
   final bool isOpen;
   final List<Course> courses;
+  final bool isArchived;
 
   Menu({
     required this.id,
@@ -19,6 +20,7 @@ class Menu {
     required this.deadline,
     required this.isOpen,
     required this.courses,
+    required this.isArchived
   }) : assert(courses.isNotEmpty, "Un menu deve avere almeno un corso");
 
 

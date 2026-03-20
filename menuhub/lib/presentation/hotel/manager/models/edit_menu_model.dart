@@ -8,6 +8,7 @@ class MenuEditorModel {
   final MealType? mealType;
   final DateTime? deadline;
   final bool isOpen;
+  final bool isArchived;
   final List<EditCourseModel> courses;
 
   final bool isLoading;
@@ -21,6 +22,7 @@ class MenuEditorModel {
     required this.mealType,
     required this.deadline,
     required this.isOpen,
+    required this.isArchived,
     required this.courses,
     required this.isLoading,
     required this.isSaving,
@@ -37,6 +39,7 @@ class MenuEditorModel {
       mealType: null,
       deadline: null,
       isOpen: false,
+      isArchived: false,
       courses: const [],
       isLoading: false,
       isSaving: false,
@@ -51,6 +54,7 @@ class MenuEditorModel {
     MealType? mealType,
     DateTime? deadline,
     bool? isOpen,
+    bool? isArchived,
     List<EditCourseModel>? courses,
     bool? isLoading,
     bool? isSaving,
@@ -67,6 +71,7 @@ class MenuEditorModel {
       mealType: clearMealType ? null : (mealType ?? this.mealType),
       deadline: clearDeadline ? null : (deadline ?? this.deadline),
       isOpen: isOpen ?? this.isOpen,
+      isArchived: isOpen ?? this.isArchived,
       courses: courses ?? this.courses,
       isLoading: isLoading ?? this.isLoading,
       isSaving: isSaving ?? this.isSaving,

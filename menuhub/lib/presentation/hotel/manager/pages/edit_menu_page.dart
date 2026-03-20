@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../shared/hotel_colors.dart';
+import '../../shared/hotel_radius.dart';
 import '../controllers/edit_menu_controller.dart';
 import '../widgets/course_card.dart';
 import '../widgets/empty_courses_card.dart';
@@ -50,214 +52,387 @@ class _MenuEditorPageState extends State<MenuEditorPage> {
         final model = widget.controller.model;
 
         return Scaffold(
-          backgroundColor: HotelColors.background,
-          appBar: AppBar(
-            backgroundColor: HotelColors.primary,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            title: Text(model.isEditMode ? 'Modifica menu' : 'Nuovo menu'),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: TextButton.icon(
-                  onPressed: model.isSaving ? null : _onSavePressed,
-                  icon: model.isSaving
-                      ? const SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
+          backgroundColor: Colors.transparent,
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  HotelColors.backgroundSecondary,
+                  HotelColors.background,
+                ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -70,
+                  right: -30,
+                  child: Container(
+                    width: 180,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: HotelColors.glowBlue,
+                      borderRadius: BorderRadius.circular(999),
                     ),
-                  )
-                      : const Icon(Icons.save, color: Colors.white),
-                  label: const Text(
-                    'Salva',
-                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-              ),
-            ],
-          ),
-          body: model.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HeaderCard(
-                    isEditMode: model.isEditMode,
-                    isOpen: model.isOpen,
+                Positioned(
+                  top: 220,
+                  left: -50,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: HotelColors.glowPurple,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  if (model.errorMessage != null) ...[
-                    ErrorBanner(message: model.errorMessage!),
-                    const SizedBox(height: 16),
-                  ],
-                  SectionCard(
-                    title: 'Informazioni generali',
-                    icon: Icons.info_outline,
-                    iconColor: HotelColors.secondary,
-                    child: Column(
-                      children: [
-                        InfoTile(
-                          label: 'Data menu',
-                          value: model.date == null
-                              ? 'Seleziona data'
-                              : _formatDate(model.date!),
-                          icon: Icons.calendar_today_outlined,
-                          onTap: _pickMenuDate,
+                ),
+                Column(
+                  children: [
+                    AppBar(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: HotelColors.textPrimary,
+                      elevation: 0,
+                      scrolledUnderElevation: 0,
+                      title: Text(
+                        model.isEditMode ? 'Modifica menu' : 'Nuovo menu',
+                        style: const TextStyle(
+                          color: HotelColors.textPrimary,
+                          fontWeight: FontWeight.w700,
                         ),
-                        const SizedBox(height: 12),
-                        MealTypeDropdown(
-                          value: model.mealType,
-                          onChanged: (value) {
-                            if (value != null) {
-                              widget.controller.setMealType(value);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        InfoTile(
-                          label: 'Deadline ordini',
-                          value: model.deadline == null
-                              ? 'Seleziona deadline'
-                              : _formatDateTime(model.deadline!),
-                          icon: Icons.schedule_outlined,
-                          onTap: _pickDeadline,
-                        ),
-                        const SizedBox(height: 12),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: const Text('Menu aperto'),
-                          subtitle: Text(
-                            model.isOpen
-                                ? 'Il menu sarà visibile al client'
-                                : 'Il menu resterà chiuso',
+                      ),
+                      actions: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: TextButton.icon(
+                            onPressed: model.isSaving ? null : _onSavePressed,
+                            style: TextButton.styleFrom(
+                              foregroundColor: HotelColors.primary,
+                            ),
+                            icon: model.isSaving
+                                ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: HotelColors.primary,
+                              ),
+                            )
+                                : const Icon(Icons.save_outlined),
+                            label: const Text(
+                              'Salva',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
-                          activeColor: HotelColors.success,
-                          value: model.isOpen,
-                          onChanged: widget.controller.setIsOpen,
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Portate',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: HotelColors.secondary,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: HotelColors.accent,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        onPressed: widget.controller.addCourse,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Aggiungi corso'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  if (model.courses.isEmpty)
-                    EmptyCoursesCard(
-                      onAddCourse: widget.controller.addCourse,
-                    )
-                  else
-                    Column(
-                      children: model.courses.map((course) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: CourseCard(
-                            course: course,
-                            onRemoveCourse: () {
-                              widget.controller.removeCourse(course.id);
-                            },
-                            onCourseTypeChanged: (value) {
-                              if (value != null) {
-                                widget.controller.updateCourseType(
-                                  courseId: course.id,
-                                  courseType: value,
-                                );
-                              }
-                            },
-                            onAddDish: () {
-                              widget.controller.addDish(course.id);
-                            },
-                            onRemoveDish: (dishId) {
-                              widget.controller.removeDish(
-                                courseId: course.id,
-                                dishId: dishId,
-                              );
-                            },
-                            onDishNameChanged: (dishId, value) {
-                              widget.controller.updateDishName(
-                                courseId: course.id,
-                                dishId: dishId,
-                                name: value,
-                              );
-                            },
-                            onDishDescriptionChanged: (dishId, value) {
-                              widget.controller.updateDishDescription(
-                                courseId: course.id,
-                                dishId: dishId,
-                                description: value,
-                              );
-                            },
-                            onToggleTag: (dishId, tag) {
-                              widget.controller.toggleDishTag(
-                                courseId: course.id,
-                                dishId: dishId,
-                                tag: tag,
-                              );
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: HotelColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: model.isSaving ? null : _onSavePressed,
-                      icon: model.isSaving
-                          ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                    Expanded(
+                      child: model.isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(),
                       )
-                          : const Icon(Icons.save_outlined),
-                      label: Text(
-                        model.isSaving ? 'Salvataggio...' : 'Salva menu',
+                          : SafeArea(
+                        top: false,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(
+                            16,
+                            8,
+                            16,
+                            24,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              HeaderCard(
+                                isEditMode: model.isEditMode,
+                                isOpen: model.isOpen,
+                              ),
+                              const SizedBox(height: 18),
+                              if (model.errorMessage != null) ...[
+                                ErrorBanner(
+                                  message: model.errorMessage!,
+                                ),
+                                const SizedBox(height: 18),
+                              ],
+                              SectionCard(
+                                title: 'Informazioni generali',
+                                icon: Icons.tune_rounded,
+                                child: Column(
+                                  children: [
+                                    InfoTile(
+                                      label: 'Data menu',
+                                      value: model.date == null
+                                          ? 'Seleziona data'
+                                          : _formatDate(model.date!),
+                                      icon: Icons.calendar_today_outlined,
+                                      onTap: _pickMenuDate,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    MealTypeDropdown(
+                                      value: model.mealType,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          widget.controller
+                                              .setMealType(value);
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    InfoTile(
+                                      label: 'Deadline ordini',
+                                      value: model.deadline == null
+                                          ? 'Seleziona deadline'
+                                          : _formatDateTime(
+                                        model.deadline!,
+                                      ),
+                                      icon: Icons.schedule_outlined,
+                                      onTap: _pickDeadline,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(
+                                          0.60,
+                                        ),
+                                        borderRadius:
+                                        BorderRadius.circular(
+                                          HotelRadius.button,
+                                        ),
+                                        border: Border.all(
+                                          color: HotelColors.borderSoft,
+                                        ),
+                                      ),
+                                      child: SwitchListTile(
+                                        contentPadding:
+                                        const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 4,
+                                        ),
+                                        title: const Text(
+                                          'Menu aperto',
+                                          style: TextStyle(
+                                            color: HotelColors.textPrimary,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          model.isOpen
+                                              ? 'Il menu è visibile lato client'
+                                              : 'Il menu resta in bozza',
+                                          style: const TextStyle(
+                                            color:
+                                            HotelColors.textSecondary,
+                                          ),
+                                        ),
+                                        activeColor:
+                                        HotelColors.success,
+                                        value: model.isOpen,
+                                        onChanged:
+                                        widget.controller.setIsOpen,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 22),
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Portate del menu',
+                                          style: TextStyle(
+                                            color:
+                                            HotelColors.textPrimary,
+                                            fontSize: 21,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Organizza la struttura del menu aggiungendo portate e piatti.',
+                                          style: TextStyle(
+                                            color: HotelColors
+                                                .textSecondary,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 0,
+                                      backgroundColor:
+                                      HotelColors.accent,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(
+                                          HotelRadius.button,
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed:
+                                    widget.controller.addCourse,
+                                    icon: const Icon(Icons.add),
+                                    label: const Text(
+                                      'Aggiungi',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              if (model.courses.isEmpty)
+                                EmptyCoursesCard(
+                                  onAddCourse:
+                                  widget.controller.addCourse,
+                                )
+                              else
+                                Column(
+                                  children:
+                                  model.courses.map((course) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 16,
+                                      ),
+                                      child: CourseCard(
+                                        course: course,
+                                        onRemoveCourse: () {
+                                          widget.controller.removeCourse(
+                                            course.id,
+                                          );
+                                        },
+                                        onCourseTypeChanged: (value) {
+                                          if (value != null) {
+                                            widget.controller
+                                                .updateCourseType(
+                                              courseId: course.id,
+                                              courseType: value,
+                                            );
+                                          }
+                                        },
+                                        onAddDish: () {
+                                          widget.controller.addDish(
+                                            course.id,
+                                          );
+                                        },
+                                        onRemoveDish: (dishId) {
+                                          widget.controller.removeDish(
+                                            courseId: course.id,
+                                            dishId: dishId,
+                                          );
+                                        },
+                                        onDishNameChanged:
+                                            (dishId, value) {
+                                          widget.controller
+                                              .updateDishName(
+                                            courseId: course.id,
+                                            dishId: dishId,
+                                            name: value,
+                                          );
+                                        },
+                                        onDishDescriptionChanged:
+                                            (dishId, value) {
+                                          widget.controller
+                                              .updateDishDescription(
+                                            courseId: course.id,
+                                            dishId: dishId,
+                                            description: value,
+                                          );
+                                        },
+                                        onToggleTag: (dishId, tag) {
+                                          widget.controller
+                                              .toggleDishTag(
+                                            courseId: course.id,
+                                            dishId: dishId,
+                                            tag: tag,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              const SizedBox(height: 28),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    HotelRadius.card,
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: HotelColors.glowBlue,
+                                      blurRadius: 24,
+                                      offset: Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor:
+                                    HotelColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 18,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(
+                                        HotelRadius.card,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: model.isSaving
+                                      ? null
+                                      : _onSavePressed,
+                                  icon: model.isSaving
+                                      ? const SizedBox(
+                                    height: 18,
+                                    width: 18,
+                                    child:
+                                    CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                      : const Icon(
+                                    Icons.save_outlined,
+                                  ),
+                                  label: Text(
+                                    model.isSaving
+                                        ? 'Salvataggio in corso...'
+                                        : 'Salva menu',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
           ),
         );
@@ -271,8 +446,13 @@ class _MenuEditorPageState extends State<MenuEditorPage> {
 
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Menu salvato con successo'),
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: HotelColors.textPrimary,
+          content: const Text('Menu salvato con successo'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(HotelRadius.button),
+          ),
         ),
       );
       widget.onSaved?.call();
@@ -369,6 +549,6 @@ class _MenuEditorPageState extends State<MenuEditorPage> {
     final date = _formatDate(dateTime);
     final h = dateTime.hour.toString().padLeft(2, '0');
     final min = dateTime.minute.toString().padLeft(2, '0');
-    return '$date - $h:$min';
+    return '$date • $h:$min';
   }
 }

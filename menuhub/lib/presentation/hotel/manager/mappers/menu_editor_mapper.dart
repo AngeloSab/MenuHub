@@ -16,6 +16,7 @@ class MenuEditorMapper {
       mealType: menu.mealType,
       deadline: menu.deadline,
       isOpen: menu.isOpen,
+      isArchived: menu.isArchived,
       courses: menu.courses.map((course) {
         return EditCourseModel(
           id: course.id,
@@ -89,6 +90,7 @@ class MenuEditorMapper {
       mealType: model.mealType!,
       deadline: model.deadline!,
       isOpen: model.isOpen,
+      isArchived: model.isArchived,
       courses: courses,
     );
   }

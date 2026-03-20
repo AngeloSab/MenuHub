@@ -20,19 +20,60 @@ class MealTypeDropdown extends StatelessWidget {
       value: value,
       decoration: InputDecoration(
         labelText: 'Tipo pasto',
-        prefixIcon: const Icon(Icons.restaurant_outlined),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(HotelRadius.input),
+        labelStyle: const TextStyle(
+          color: HotelColors.textSecondary,
+          fontWeight: FontWeight.w500,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(HotelRadius.input),
-          borderSide: BorderSide(
-            color: HotelColors.secondary.withOpacity(0.2),
+        prefixIcon: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: HotelColors.accent.withOpacity(0.10),
+            borderRadius: BorderRadius.circular(HotelRadius.button),
+          ),
+          child: const Icon(
+            Icons.restaurant_outlined,
+            color: HotelColors.accent,
+            size: 20,
           ),
         ),
+        filled: true,
+        fillColor: HotelColors.surfacePurple,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(HotelRadius.button),
+          borderSide: const BorderSide(
+            color: HotelColors.borderSoft,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(HotelRadius.button),
+          borderSide: const BorderSide(
+            color: HotelColors.borderSoft,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(HotelRadius.button),
+          borderSide: const BorderSide(
+            color: HotelColors.accent,
+            width: 1.4,
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 16,
+        ),
+      ),
+      dropdownColor: HotelColors.cardBackground,
+      icon: const Icon(
+        Icons.keyboard_arrow_down_rounded,
+        color: HotelColors.secondary,
+      ),
+      style: const TextStyle(
+        color: HotelColors.textPrimary,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
       ),
       items: MealType.values.map((mealType) {
-        return DropdownMenuItem(
+        return DropdownMenuItem<MealType>(
           value: mealType,
           child: Text(_mealTypeLabel(mealType)),
         );

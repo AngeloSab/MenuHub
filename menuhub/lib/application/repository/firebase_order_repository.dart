@@ -64,7 +64,11 @@ class FirebaseOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<domain.Order?> getById(String hotelId, String menuId, String orderId) async {
+  Future<domain.Order?> getById(
+      String hotelId,
+      String menuId,
+      String orderId,
+      ) async {
     final doc = await firestore
         .collection('hotels')
         .doc(hotelId)
@@ -150,6 +154,22 @@ class FirebaseOrderRepository implements OrderRepository {
       docId: doc.id,
       data: doc.data(),
     );
+  }
+
+  @override
+  Future<int> countByMenu({
+    required String hotelId,
+    required String menuId,
+  }) async {
+    final snapshot = await firestore
+        .collection('hotels')
+        .doc(hotelId)
+        .collection('menus')
+        .doc(menuId)
+        .collection('orders')
+        .get();
+
+    return snapshot.docs.length;
   }
 
   @override

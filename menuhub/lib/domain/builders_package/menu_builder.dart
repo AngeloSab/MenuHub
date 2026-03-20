@@ -36,6 +36,7 @@ class MenuBuilder {
       mealType: mealType,
       deadline: deadline,
       isOpen: false,
+      isArchived: false,
       courses: List.unmodifiable(_courses),
     );
   }

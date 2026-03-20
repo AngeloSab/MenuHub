@@ -24,77 +24,162 @@ class DishCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: HotelColors.primary.withOpacity(0.04),
+        color: Colors.white.withOpacity(0.72),
         borderRadius: BorderRadius.circular(HotelRadius.button),
         border: Border.all(
-          color: HotelColors.primary.withOpacity(0.12),
+          color: HotelColors.borderSoft,
         ),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Piatto',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: HotelColors.primary.withOpacity(0.10),
+                    borderRadius:
+                    BorderRadius.circular(HotelRadius.button),
+                  ),
+                  child: const Icon(
+                    Icons.restaurant_outlined,
+                    size: 20,
+                    color: HotelColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Piatto',
+                    style: TextStyle(
+                      color: HotelColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Rimuovi piatto',
+                  onPressed: onRemove,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: HotelColors.warning,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              initialValue: dish.name,
+              decoration: InputDecoration(
+                labelText: 'Nome piatto',
+                labelStyle: const TextStyle(
+                  color: HotelColors.textSecondary,
+                ),
+                filled: true,
+                fillColor: HotelColors.cardBackground,
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.borderSoft,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.borderSoft,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.primary,
+                    width: 1.4,
                   ),
                 ),
               ),
-              IconButton(
-                tooltip: 'Rimuovi piatto',
-                onPressed: onRemove,
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: HotelColors.warning,
+              onChanged: onNameChanged,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              initialValue: dish.description,
+              minLines: 2,
+              maxLines: 4,
+              decoration: InputDecoration(
+                labelText: 'Descrizione',
+                labelStyle: const TextStyle(
+                  color: HotelColors.textSecondary,
+                ),
+                filled: true,
+                fillColor: HotelColors.cardBackground,
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.borderSoft,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.borderSoft,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(HotelRadius.button),
+                  borderSide: const BorderSide(
+                    color: HotelColors.primary,
+                    width: 1.4,
+                  ),
                 ),
               ),
-            ],
-          ),
-          TextFormField(
-            initialValue: dish.name,
-            decoration: InputDecoration(
-              labelText: 'Nome piatto',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              onChanged: onDescriptionChanged,
             ),
-            onChanged: onNameChanged,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            initialValue: dish.description,
-            minLines: 2,
-            maxLines: 4,
-            decoration: InputDecoration(
-              labelText: 'Descrizione',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onChanged: onDescriptionChanged,
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: DishTag.values.map((tag) {
-                final isSelected = dish.dishTags.contains(tag);
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: DishTag.values.map((tag) {
+                  final isSelected = dish.dishTags.contains(tag);
 
-                return FilterChip(
-                  selected: isSelected,
-                  label: Text(_dishTagLabel(tag)),
-                  onSelected: (_) => onToggleTag(tag),
-                );
-              }).toList(),
+                  return FilterChip(
+                    selected: isSelected,
+                    showCheckmark: false,
+                    backgroundColor: HotelColors.cardBackground,
+                    selectedColor: HotelColors.accent.withOpacity(0.12),
+                    side: BorderSide(
+                      color: isSelected
+                          ? HotelColors.accent.withOpacity(0.22)
+                          : HotelColors.borderSoft,
+                    ),
+                    label: Text(
+                      _dishTagLabel(tag),
+                      style: TextStyle(
+                        color: isSelected
+                            ? HotelColors.accent
+                            : HotelColors.textSecondary,
+                        fontWeight:
+                        isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    onSelected: (_) => onToggleTag(tag),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

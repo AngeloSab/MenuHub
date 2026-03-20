@@ -25,4 +25,14 @@ abstract class MenuRepository {
     required String hotelId,
     required String menuId,
   });
+
+  Future<void> delete({
+    required String hotelId,
+    required String menuId,
+  });
+
+  Future<void> archive({
+    required String hotelId,
+    required String menuId,
+  });
 }
