@@ -1,19 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'application/repository/firebase_menu_repository.dart';
-import 'application/repository/firebase_order_repository.dart';
-import 'application/use_cases/staff/close_menu_uc.dart';
-import 'application/use_cases/staff/archive_menu_uc.dart';
-import 'application/use_cases/staff/get_menu_orders_count_uc.dart';
-import 'application/use_cases/staff/delete_menu_uc.dart';
-import 'application/use_cases/staff/create_menu_uc.dart';
-import 'application/use_cases/staff/get_menu_by_id_uc.dart';
-import 'application/use_cases/staff/open_menu_uc.dart';
-import 'application/use_cases/staff/watch_menus_by_hotel_uc.dart';
+import 'package:menuhub/tester/test_menu/client_test_app.dart';
+import 'package:menuhub/tester/test_menu/hotel_test_app.dart';
 import 'firebase_option.dart';
-import 'presentation/hotel/manager/controllers/menu_list_controller.dart';
-import 'presentation/hotel/manager/pages/menu_list_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,37 +11,111 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const ManagerRefactorTestApp());
+  runApp(const MainTestApp());
 }
 
-class ManagerRefactorTestApp extends StatelessWidget {
-  const ManagerRefactorTestApp({super.key});
+class MainTestApp extends StatelessWidget {
+  const MainTestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final firestore = FirebaseFirestore.instance;
-    final menuRepository = FirebaseMenuRepository(firestore);
-    final orderRepository = FirebaseOrderRepository(firestore);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'MenuHub Manager Refactor Test',
+      title: 'MenuHub Test Launcher',
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: MenuListPage(
-        controller: MenuListController(
-          watchMenusByHotelUC: WatchMenusByHotelUC(menuRepository),
-          openMenuUC: OpenMenuUC(menuRepository),
-          closeMenuUC: CloseMenuUC(menuRepository),
-          deleteMenuUC: DeleteMenuUC(menuRepository),
-          getMenuOrdersCountUC: GetMenuOrdersCountUC(orderRepository),
-          archiveMenuUC: ArchiveMenuUC(menuRepository)
+      home: const _TestModeSelectorPage(),
+    );
+  }
+}
+
+class _TestModeSelectorPage extends StatelessWidget {
+  const _TestModeSelectorPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFEEF4FF),
+              Color(0xFFF6F8FD),
+            ],
+          ),
         ),
-        hotelId: 'hotel_test_01',
-        getMenuByIdUC: GetMenuByIdUC(menuRepository),
-        createMenuUC: CreateMenuUC(menuRepository),
-        updateMenuUC: CreateMenuUC(menuRepository),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.restaurant_menu,
+                  size: 72,
+                  color: Color(0xFF305AE3),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'MenuHub Tester',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Scegli quale lato dell’applicazione vuoi testare.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ClientTestApp(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.smartphone_outlined),
+                    label: const Text('Test lato Client'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const HotelTestApp(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.apartment_outlined),
+                    label: const Text('Test lato Hotel'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

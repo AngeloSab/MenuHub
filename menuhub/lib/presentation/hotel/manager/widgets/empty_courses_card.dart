@@ -6,96 +6,37 @@ import '../../shared/hotel_radius.dart';
 class EmptyCoursesCard extends StatelessWidget {
   final VoidCallback onAddCourse;
 
-  const EmptyCoursesCard({
-    super.key,
-    required this.onAddCourse,
-  });
+  const EmptyCoursesCard({super.key, required this.onAddCourse});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
+        color: HotelColors.cardBackground,
         borderRadius: BorderRadius.circular(HotelRadius.card),
-        boxShadow: const [
-          BoxShadow(
-            color: HotelColors.glowPurple,
-            blurRadius: 26,
-            offset: Offset(0, 10),
+        border: Border.all(color: HotelColors.borderSoft),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.layers_outlined,
+              size: 40, color: HotelColors.textSecondary),
+          const SizedBox(height: 12),
+          const Text(
+            'Nessuna portata',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Aggiungi la prima portata',
+            style: TextStyle(color: HotelColors.textSecondary),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onAddCourse,
+            child: const Text('Aggiungi'),
           ),
         ],
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(HotelRadius.card),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              HotelColors.cardBackground,
-              HotelColors.surfacePurple,
-            ],
-          ),
-          border: Border.all(
-            color: HotelColors.accent.withOpacity(0.12),
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 68,
-              height: 68,
-              decoration: BoxDecoration(
-                color: HotelColors.accent.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.layers_outlined,
-                size: 32,
-                color: HotelColors.accent,
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Text(
-              'Nessuna portata aggiunta',
-              style: TextStyle(
-                color: HotelColors.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Inizia aggiungendo una portata. Potrai poi inserire i piatti e completare il menu in modo ordinato.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: HotelColors.textSecondary,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 18),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: HotelColors.accent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(HotelRadius.button),
-                ),
-              ),
-              onPressed: onAddCourse,
-              icon: const Icon(Icons.add),
-              label: const Text('Aggiungi portata'),
-            ),
-          ],
-        ),
       ),
     );
   }

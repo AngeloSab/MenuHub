@@ -19,71 +19,54 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedIconColor = iconColor ?? HotelColors.secondary;
+    final color = iconColor ?? HotelColors.primary;
 
     return Container(
       decoration: BoxDecoration(
+        color: HotelColors.cardBackground,
         borderRadius: BorderRadius.circular(HotelRadius.card),
-        boxShadow: const [
+        border: Border.all(color: HotelColors.borderSoft),
+        boxShadow: [
           BoxShadow(
-            color: HotelColors.glowBlue,
-            blurRadius: 24,
-            offset: Offset(0, 10),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(HotelRadius.card),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              HotelColors.cardBackground,
-              HotelColors.surfaceBlue,
-            ],
-          ),
-          border: Border.all(
-            color: HotelColors.borderSoft,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: resolvedIconColor.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(HotelRadius.button),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: resolvedIconColor,
-                      size: 20,
-                    ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// HEADER
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(HotelRadius.button),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: HotelColors.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: HotelColors.textPrimary,
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              child,
-            ],
-          ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            child,
+          ],
         ),
       ),
     );
