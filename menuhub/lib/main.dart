@@ -1,121 +1,44 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:menuhub/tester/test_menu/client_test_app.dart';
-import 'package:menuhub/tester/test_menu/hotel_test_app.dart';
-import 'firebase_option.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'application/use_case/create_client_session_uc.dart';
+import 'application/use_case/place_order_uc.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+import 'application/repository/firebase_client_session_repository.dart';
+import 'application/repository/firebase_order_repository.dart';
+import 'infrastructure/local/client_session_local_repository.dart';
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+import 'presentation/client/pages/client_entry_page.dart';
 
-  runApp(const MainTestApp());
+import 'domain/menu_package/menu.dart';
+
+void main() {
+  runApp(const MenuHubApp());
 }
 
-class MainTestApp extends StatelessWidget {
-  const MainTestApp({super.key});
+class MenuHubApp extends StatelessWidget {
+  const MenuHubApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final firestore = FirebaseFirestore.instance;
+
+    final clientSessionRepository = FirebaseClientSessionRepository(firestore);
+    final orderRepository = FirebaseOrderRepository(firestore);
+
+    final createClientSessionUC = CreateClientSessionUC(clientSessionRepository);
+    final placeOrderUC = PlaceOrderUC(orderRepository);
+
+    final localSessionRepository = ClientSessionLocalRepository();
+
+    final Menu testMenu = createTestMenu();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'MenuHub Test Launcher',
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      home: const _TestModeSelectorPage(),
-    );
-  }
-}
-
-class _TestModeSelectorPage extends StatelessWidget {
-  const _TestModeSelectorPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFEEF4FF),
-              Color(0xFFF6F8FD),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.restaurant_menu,
-                  size: 72,
-                  color: Color(0xFF305AE3),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'MenuHub Tester',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Scegli quale lato dell’applicazione vuoi testare.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ClientTestApp(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.smartphone_outlined),
-                    label: const Text('Test lato Client'),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const HotelTestApp(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.apartment_outlined),
-                    label: const Text('Test lato Hotel'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      home: ClientEntryPage(
+        menu: testMenu,
+        placeOrderUC: placeOrderUC,
+        createClientSessionUC: createClientSessionUC,
+        localRepository: localSessionRepository,
       ),
     );
   }
